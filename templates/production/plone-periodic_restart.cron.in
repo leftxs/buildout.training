@@ -1,0 +1,28 @@
+# Periodic restart of milieudefensie.nl
+
+AUTHOR="Maarten te Paske/Sven Strack"
+NAME="plone-periodic_restart.cron"
+MASTERLOG="${buildout:directory}/var/log/plone-periodic_restart.log"
+ESCALATE_MAILTO="svens@milieudefensie.nl"
+#MAILTO="$ESCALATE_MAILTO"
+# BCLOCKFILE=""
+
+ME=$(whoami)
+RUNAS="zopeuser"
+SVCTL="/home/zopeuser/sites/training.milieudefensie.nl/buildout/bin/supervisorctl"
+
+function func_cron() {
+
+        echo "## Checking prerequisites for script to run"
+        [ "$ME" = "$RUNAS" ]    || fatal "Script must be run by user $RUNAS"
+        [ -x "$SVCTL" ]         || fatal "Can't run $SVCTL"
+        echo "## DONE"
+
+        echo
+
+        echo "## Restarting plone"
+        $SVCTL restart all      || error "Could not restart Plone"
+        echo "## DONE"
+
+}
+
